@@ -31,7 +31,7 @@ def get_openai_message():
     )
 
     completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo,
+        model="gpt-3.5-turbo",
         messages=[{"role": "user", "content": prompt}]
     )
 
