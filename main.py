@@ -49,7 +49,7 @@ def send_checklist(data: TriggerRequest):
         )
         return {"status": "sent", "sid": message.sid}
     except Exception as e:
-    print("ERROR:", str(e))
+        print("ERROR:", str(e))
     return {"status": "failed", "error": str(e), "from": TWILIO_FROM, "to": TWILIO_TO}
 
 
