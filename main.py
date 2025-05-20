@@ -50,3 +50,8 @@ def send_checklist(data: TriggerRequest):
         return {"status": "sent", "sid": message.sid}
     except Exception as e:
         return {"status": "failed", "error": str(e)}
+
+# Root route to confirm app is live
+@app.get("/")
+def root():
+    return {"status": "Agentai is live!"}
