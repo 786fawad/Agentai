@@ -39,7 +39,10 @@ def get_openai_message():
 
 @app.post("/send_checklist")
 def send_checklist(data: TriggerRequest):
-    message_body = get_openai_message()
+    try:
+        message_body = get_openai_message()
+    except Exception as e:
+        return {"status": "OpenAI error", "error": str(e)}
 
     try:
         message = client.messages.create(
@@ -49,4 +52,4 @@ def send_checklist(data: TriggerRequest):
         )
         return {"status": "sent", "sid": message.sid}
     except Exception as e:
-        return {"status": "failed", "error": str(e)}
+        return {"status": "Twilio error", "error": str(e), "fallback_message": message_body}
