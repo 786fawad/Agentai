@@ -51,6 +51,18 @@ def send_checklist(data: TriggerRequest):
     except Exception as e:
         return {"status": "failed", "error": str(e)}
 
+
+#code for twillio
+@app.post("/trigger")
+def send_checklist(request: TriggerRequest):
+    message = get_openai_message()
+    sent = client.messages.create(
+        from_=TWILIO_FROM,
+        to=TWILIO_TO,
+        body=message
+    )
+    return {"status": "sent", "sid": sent.sid}
+
 # Root route to confirm app is live
 @app.get("/")
 def root():
