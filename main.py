@@ -53,7 +53,7 @@ def send_checklist(data: TriggerRequest):
 
 
 #code for twillio
-@app.post("/trigger")
+@app.get("/trigger")
 def send_checklist(request: TriggerRequest):
     message = get_openai_message()
     sent = client.messages.create(
