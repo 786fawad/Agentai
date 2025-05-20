@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from twilio.rest import Client as TwilioClient
-from openai import OpenAI
+from twilio.rest import Client
+import openai
 import os
 
 app = FastAPI()
@@ -13,9 +13,8 @@ TWILIO_FROM = os.getenv("TWILIO_WHATSAPP_FROM")
 TWILIO_TO = os.getenv("TWILIO_WHATSAPP_TO")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# Clients
-twilio_client = TwilioClient(TWILIO_SID, TWILIO_TOKEN)
-openai_client = OpenAI()
+client = Client(TWILIO_SID, TWILIO_TOKEN)
+openai.api_key = OPENAI_API_KEY
 
 class TriggerRequest(BaseModel):
     name: str = "ChecklistTrigger"
@@ -31,25 +30,23 @@ def get_openai_message():
         "Use line breaks \n for formatting. Include emojis and friendly tone."
     )
 
-    completion = openai_client.chat.completions.create(
+    completion = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[{"role": "user", "content": prompt}]
     )
+
     return completion.choices[0].message.content
 
 @app.post("/send_checklist")
 def send_checklist(data: TriggerRequest):
-    try:
-        message_body = get_openai_message()
-    except Exception as e:
-        return {"status": "OpenAI error", "error": str(e)}
+    message_body = get_openai_message()
 
     try:
-        message = twilio_client.messages.create(
+        message = client.messages.create(
             body=message_body,
             from_=f'whatsapp:{TWILIO_FROM}',
             to=f'whatsapp:{TWILIO_TO}'
         )
         return {"status": "sent", "sid": message.sid}
     except Exception as e:
-        return {"status": "Twilio error", "error": str(e), "fallback_message": message_body}
+        return {"status": "failed", "error": str(e)}
